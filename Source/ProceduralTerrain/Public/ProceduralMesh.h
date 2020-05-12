@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FVector> Normals;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FProcMeshTangent> Tangents;
+
 	void AddTriangle(int32 V1, int32 V2, int32 V3);
 
 	void GenerateCubeMesh();

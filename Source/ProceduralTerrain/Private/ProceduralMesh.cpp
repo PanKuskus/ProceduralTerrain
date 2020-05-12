@@ -25,7 +25,7 @@ void AProceduralMesh::BeginPlay()
 void AProceduralMesh::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	CustomMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), UV, VertexColors, TArray<FProcMeshTangent>(), true);
+	CustomMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UV, VertexColors, Tangents, true);
 
 }
 
@@ -41,7 +41,7 @@ void AProceduralMesh::GenerateCubeMesh()
 	//6 sides on cube, 4 verts each (corners)
 
 	//These are relative locations to the placed Actor in the world
-	Vertices.Add(FVector(0, -100, 0)); //lower left - 0
+	Vertices.Add(FVector(0, -40, 0)); //lower left - 0
 	Vertices.Add(FVector(0, -100, 100)); //upper left - 1
 	Vertices.Add(FVector(0, 100, 0)); //lower right - 2 
 	Vertices.Add(FVector(0, 100, 100)); //upper right - 3
@@ -56,6 +56,21 @@ void AProceduralMesh::GenerateCubeMesh()
 	VertexColors.Add(FLinearColor(1.f, 0.f, 0.f));
 	VertexColors.Add(FLinearColor(1.f, 0.f, 0.f));
 	VertexColors.Add(FLinearColor(0.f, 1.f, 0.f));
+
+	UV.Add(FVector2D(0, 1));
+	UV.Add(FVector2D(0, 0));
+	UV.Add(FVector2D(1, 1));
+	UV.Add(FVector2D(1, 0));
+
+	Normals.Add(FVector(-1, 0, 0));
+	Normals.Add(FVector(-1, 0, 0));
+	Normals.Add(FVector(-1, 0, 0));
+	Normals.Add(FVector(-1, 0, 0));
+
+	Tangents.Add(FProcMeshTangent(0, 1, 0));
+	Tangents.Add(FProcMeshTangent(0, 1, 0));
+	Tangents.Add(FProcMeshTangent(0, 1, 0));
+	Tangents.Add(FProcMeshTangent(0, 1, 0));
 	
 }
 
