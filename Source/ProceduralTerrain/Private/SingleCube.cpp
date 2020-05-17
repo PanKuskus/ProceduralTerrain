@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Public/ProceduralMesh.h"
+#include "SingleCube.h"
 
 // Sets default values
-AProceduralMesh::AProceduralMesh()
+ASingleCube::ASingleCube()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -12,13 +12,9 @@ AProceduralMesh::AProceduralMesh()
 	CustomMesh = CreateDefaultSubobject<UProceduralMeshComponent>("CustomMesh");
 	SetRootComponent(CustomMesh);
 	CustomMesh->bUseAsyncCooking = true;
-}
 
-// Called when the game starts or when spawned
-void AProceduralMesh::BeginPlay()
-{
-	Super::BeginPlay();
 	isolevel = 15;
+	offset = FVector(0.f, 0.f, 0.f);
 
 	grid.p[0] = FVector(0, 0, 0);
 	grid.p[1] = FVector(100, 0, 0);
@@ -29,55 +25,75 @@ void AProceduralMesh::BeginPlay()
 	grid.p[6] = FVector(100, 100, 100);
 	grid.p[7] = FVector(0, 100, 100);
 
-
-	grid.val[0] = 0;
-	grid.val[1] = 0;
-	for (int i = 2; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		grid.val[i] = 20;
+		grid.val[i] = 0;
 	}
 }
 
+// Called when the game starts or when spawned
+void ASingleCube::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
 // Called every frame
-void AProceduralMesh::Tick(float DeltaTime)
+void ASingleCube::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	GenerateMesh();
 	CustomMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UV, VertexColors, Tangents, true);
 }
 
-void AProceduralMesh::AddTriangle(int32 V1, int32 V2, int32 V3)
-{
-	Triangles.Add(V1);
-	Triangles.Add(V2);
-	Triangles.Add(V3);
-}
 
-void AProceduralMesh::GenerateMesh()
+
+void ASingleCube::GenerateMesh()
 {
 	Vertices.Empty();
 	Triangles.Empty();
-	
-	TrianglesFromMarching = new FTRIANGLE[16];
-	
+
+	TrianglesFromMarching = new FTRIANGLE[8];
+
 
 	int numTriangles = Polygonise(grid, isolevel, TrianglesFromMarching);
 
 	for (int i = 0; i < numTriangles; i++)
 	{
-		Vertices.Add(TrianglesFromMarching[i].p[0]); 
-		Vertices.Add(TrianglesFromMarching[i].p[1]); 
-		Vertices.Add(TrianglesFromMarching[i].p[2]); 
-		AddTriangle(i*3, i*3+1, i*3+2);
+		Vertices.Add(TrianglesFromMarching[i].p[0] + offset);
+		Vertices.Add(TrianglesFromMarching[i].p[1] + offset);
+		Vertices.Add(TrianglesFromMarching[i].p[2] + offset);
+
+		Triangles.Add(i * 3);
+		Triangles.Add(i * 3 + 1);
+		Triangles.Add(i * 3 + 2);
 	}
 	delete[] TrianglesFromMarching;
 }
 
-
-
-FVector VertexInterp(double isolevel, FVector p1, FVector p2, double valp1, double valp2)
+void ASingleCube::SetIsoLevel(float _isolevel)
 {
-	double mu;
+	isolevel = _isolevel;
+}
+
+
+void ASingleCube::SetOffset(FVector _offset)
+{
+	offset = _offset;
+}
+
+void ASingleCube::SetValues(int32 values[8])
+{
+	for (int i = 0; i < 8; i++)
+	{
+		grid.val[i] = values[i];
+	}
+}
+
+
+FVector VertexInterp(float isolevel, FVector p1, FVector p2, float valp1, float valp2)
+{
+	float mu;
 	FVector p;
 
 	if (abs(isolevel - valp1) < 0.00001)
@@ -95,7 +111,7 @@ FVector VertexInterp(double isolevel, FVector p1, FVector p2, double valp1, doub
 	return(p);
 }
 
-int AProceduralMesh::Polygonise(FGRIDCELL grid, float isolevel, FTRIANGLE* triangles)
+int ASingleCube::Polygonise(FGRIDCELL grid, float isolevel, FTRIANGLE* triangles)
 {
 
 	int edgeTable[256] = {
