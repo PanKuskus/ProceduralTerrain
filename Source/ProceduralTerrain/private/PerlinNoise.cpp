@@ -145,6 +145,6 @@ double PerlinNoise::simplexNoise3D(double x, double y, double z)
 	}
 
 	
-	return (32.0 * (n0 + n1 + n2 + n3)); // TODO: The scale factor is preliminary!
+	return (32.0 * (n0 + n1 + n2 + n3)); 
 }
 
